@@ -2,6 +2,8 @@
 require 'shellwords'
 
 Vagrant.configure('2') do |config|
+  withES = true
+
   config.vm.box = 'debian/buster64'
 
   config.vm.hostname = 'prestashop'
@@ -21,11 +23,16 @@ Vagrant.configure('2') do |config|
   ]
   config.vm.provision :shell, path: 'provisioning/script.sh', args: args.join(' ')
 
+  if withES then
+    config.vm.synced_folder "../ESearch/src", "/var/www/prestashop/modules/cs_esearch"
+    config.vm.provision :shell, name: 'elasticsearch', path: 'provisioning/elasticsearch.sh'
+  end
+
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
   config.vm.provider 'virtualbox' do |vb|
     # Display the VirtualBox GUI when booting the machine
-    vb.gui = false
+    vb.gui = true
 
     # Customize the amount of memory on the VM:
     vb.memory = '2048'
